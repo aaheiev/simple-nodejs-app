@@ -1,0 +1,15 @@
+  
+# Logs
+logs
+*.log
+.git
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.env
+
+node_modules
+data
+Gemfile.lock

@@ -1,0 +1,16 @@
+{{- $fullName    := include "simple-nodejs-app.fullname" . -}}
+---
+apiVersion:                       autoscaling/v1
+kind:                             HorizontalPodAutoscaler
+metadata:
+  name:                           {{ $fullName }}
+  labels:
+{{ include "simple-nodejs-app.labels" . | indent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion:                   apps/v1
+    kind:                         Deployment
+    name:                         {{ $fullName }}
+  minReplicas:                    {{ .Values.minReplicaCount }}
+  maxReplicas:                    {{ .Values.maxReplicaCount }}
+  targetCPUUtilizationPercentage: {{ .Values.autoscalerCPULimit }}

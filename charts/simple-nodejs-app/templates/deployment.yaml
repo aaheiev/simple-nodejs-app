@@ -1,0 +1,52 @@
+{{- $fullName    := include "simple-nodejs-app.fullname" . -}}
+{{- $configName  := default $fullName .Values.existingConfigMap -}}
+apiVersion:                         apps/v1
+kind:                               Deployment
+metadata:
+  name:                             {{ $fullName }}
+  labels:
+{{ include "simple-nodejs-app.labels" . | indent 4 }}
+
+spec:
+  replicas:                         {{ .Values.minReplicaCount }}
+  selector:
+    matchLabels:
+      {{- include "simple-nodejs-app.selectorLabels" . | nindent 6 }}
+
+  template:
+    metadata:
+      labels:
+        {{- include "simple-nodejs-app.selectorLabels2" . | nindent 8 }}
+    spec:
+      restartPolicy:                Always
+      containers:
+        - name:                     {{ $fullName }}
+          image:                    {{ .Values.image.repository }}:{{ .Chart.AppVersion }}
+          imagePullPolicy:          {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name:               {{ $configName }}
+          ports:
+            - name:                 http
+              containerPort:        {{ .Values.config.HTTP_PORT }}
+              protocol:             TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            initialDelaySeconds:  {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds:       {{ .Values.livenessProbe.timeoutSeconds }}
+            periodSeconds:        {{ .Values.livenessProbe.periodSeconds }}
+            successThreshold:     {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold:     {{ .Values.livenessProbe.failureThreshold }}
+            httpGet:
+              path:               {{ .Values.livenessProbe.httpGet.path }}
+              port:               http
+          readinessProbe:
+            initialDelaySeconds:  {{ .Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds:       {{ .Values.readinessProbe.timeoutSeconds }}
+            periodSeconds:        {{ .Values.readinessProbe.periodSeconds }}
+            successThreshold:     {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold:     {{ .Values.readinessProbe.failureThreshold }}
+            httpGet:
+              path:               {{ .Values.readinessProbe.httpGet.path }}
+              port:               http

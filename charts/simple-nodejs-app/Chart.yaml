@@ -1,0 +1,6 @@
+apiVersion: v2
+name: simple-nodejs-app
+description: Helm chart for simple-nodejs-app
+type: application
+version: 0.6.1.43
+appVersion: 0.6.1.43

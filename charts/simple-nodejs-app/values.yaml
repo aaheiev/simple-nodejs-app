@@ -1,0 +1,50 @@
+nameOverride:          "simple-nodejs-app"
+fullnameOverride:      "simple-nodejs-app"
+minReplicaCount:       1
+maxReplicaCount:       25
+autoscalerCPULimit:    65
+
+initializeConfig:      true
+#existingConfigMap:
+config:
+  HTTP_PORT:           3000
+  NODE_ENV:            integration
+
+image:
+  repository:          xlinqreg.azurecr.io/simple-nodejs-app
+  pullPolicy:          IfNotPresent
+
+
+service:
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+  type:                LoadBalancer
+  httpPort:            80
+#  type:                ClusterIP
+#  httpPort:            3000
+
+resources:
+  limits:
+    cpu:               200m
+    memory:            512Mi
+  requests:
+    cpu:               50m
+    memory:            128Mi
+
+livenessProbe:
+  initialDelaySeconds: 5
+  periodSeconds:       60
+  timeoutSeconds:      10
+  successThreshold:    1
+  failureThreshold:    10
+  httpGet:
+    path:              /
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds:       30
+  timeoutSeconds:      10
+  successThreshold:    1
+  failureThreshold:    10
+  httpGet:
+    path:              /

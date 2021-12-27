@@ -1,0 +1,15 @@
+{{- $fullName    := include "simple-nodejs-app.fullname" . -}}
+{{- $configName  := default $fullName .Values.existingConfigMap -}}
+{{- if .Values.initializeConfig -}}
+---
+apiVersion:                       v1
+kind:                             ConfigMap
+metadata:
+  name:                           {{ $configName }}
+  labels:
+{{ include "simple-nodejs-app.labels" . | indent 4 }}
+data:
+{{- range $name, $value := .Values.config }}
+  {{ $name }}: {{ $value | quote }}
+{{- end }}
+{{- end }}

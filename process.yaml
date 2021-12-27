@@ -1,0 +1,10 @@
+---
+# configuraion for docker
+apps:
+  - name:               simple-nodejs-app
+    script:             bin/www
+    instances:          4
+    exec_mode:          cluster
+    max_memory_restart: 512M
+    error_file:         /opt/app/app.error.log
+    out_file:           /opt/app/app.output.log

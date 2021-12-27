@@ -1,0 +1,29 @@
+{
+  "name"                  : "simple-nodejs-app",
+  "version"               : "0.7.10",
+  "config"                : {
+    "http_port"           : "3000"
+  },
+  "description"           : "Simple NodeJs HTTP application",
+  "private"               : true,
+  "scripts"               : {
+    "start"               : "node ./bin/www"
+  },
+  "author"                : "Andrii.Aheiev@ing.com",
+  "license"               : "ISC",
+  "repository"            : {
+    "type"                : "git",
+    "url"                 : "https://xlinq@dev.azure.com/xlinq/xlinq/_git/simple-nodejs-app"
+  },
+  "dependencies"          : {
+    "cookie-parser"       : "~1.4.4",
+    "debug"               : "~2.6.9",
+    "ejs"                 : "~2.6.1",
+    "express"             : "~4.16.1",
+    "express-healthcheck" : "^0.1.0",
+    "http-errors"         : "~1.6.3",
+    "morgan"              : "~1.9.1",
+    "node-os-utils"       : "^1.2.2",
+    "pjson"               : "^1.0.9"
+  }
+}

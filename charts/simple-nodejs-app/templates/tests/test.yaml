@@ -1,0 +1,17 @@
+{{- $fullName    := include "simple-nodejs-app.fullname" . -}}
+---
+apiVersion:                       v1
+kind:                             Pod
+metadata:
+  name:                           "{{ $fullName }}-test"
+  labels:
+{{ include "simple-nodejs-app.labels" . | indent 4 }}
+  annotations:
+    "helm.sh/hook":               test-success
+spec:
+  containers:
+    - name:                       wget
+      image:                      busybox
+      command:                    ['wget']
+      args:                       ['{{ $fullName }}:{{ .Values.service.httpPort }}']
+  restartPolicy:                  Never

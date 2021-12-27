@@ -1,0 +1,21 @@
+{{- $fullName    := include "simple-nodejs-app.fullname" . -}}
+---
+apiVersion:                       v1
+kind:                             Service
+metadata:
+  name:                           {{ $fullName }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+{{ include "simple-nodejs-app.labels" . | indent 4 }}
+spec:
+  type:                           {{ .Values.service.type }}
+  ports:
+    - port:                       {{ .Values.service.httpPort }}
+      targetPort:                 http
+      protocol:                   TCP
+      name:                       http
+  selector:
+    {{- include "simple-nodejs-app.selectorLabels" . | nindent 4 }}
