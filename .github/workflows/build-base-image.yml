@@ -17,5 +17,5 @@ jobs:
 
     - name: Configure
       run: |
-        tag=$(date +%s)
+        tag=$(date +%F)
         echo $tag
