@@ -6,7 +6,8 @@ on:
       - main
       - build-base-image
 env:
-  IMAGE_REPO: ghcr.io/aaheiev/simple-nodejs-app
+  # IMAGE_REPO: ghcr.io/aaheiev/simple-nodejs-app
+  IMAGE_REPO: ghcr.io/aaheiev/base/nodejs
 jobs:
 
   build:
@@ -29,7 +30,7 @@ jobs:
           docker pull ${{ env.IMAGE_REPO }}:$GITHUB_SHA
         else
           echo "Building new image"
-          docker build --target klarstein_storage_backend -t ${{ env.IMAGE_REPO }}:$GITHUB_SHA .
+          docker build -t ${{ env.IMAGE_REPO }}:$GITHUB_SHA ./base-docker-image
           docker push ${{ env.IMAGE_REPO }}:$GITHUB_SHA
         fi
 
