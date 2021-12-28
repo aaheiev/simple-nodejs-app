@@ -37,7 +37,7 @@ jobs:
     - name: Publish docker image tags
       run: |
         dateTag=$(date +%F)
-        docker tag ${{ env.IMAGE_REPO }}:IMAGE_REPO ${{ env.IMAGE_REPO }}:latest
+        docker tag ${{ env.IMAGE_REPO }}:$GITHUB_SHA ${{ env.IMAGE_REPO }}:latest
         docker push ${{ env.IMAGE_REPO }}:latest
-        docker tag ${{ env.IMAGE_REPO }}:IMAGE_REPO ${{ env.IMAGE_REPO }}:$dateTag
+        docker tag ${{ env.IMAGE_REPO }}:$GITHUB_SHA ${{ env.IMAGE_REPO }}:$dateTag
         docker push ${{ env.IMAGE_REPO }}:$dateTag
