@@ -1,5 +1,7 @@
-# docker build -t simple-nodejs-app .
-FROM base/nodejs
+# docker build --build-arg base_image=ghcr.io/aaheiev/base/nodejs -t simple-nodejs-app .
+ARG base_image
+
+FROM $base_image
 
 ARG build_id=0
 ARG git_branch='undefined'

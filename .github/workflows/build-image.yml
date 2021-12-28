@@ -1,0 +1,66 @@
+name: Build docker image
+
+on:
+  push:
+    branches:
+      - main
+      - ci-pipeline
+env:
+  BASE_IMAGE: ghcr.io/aaheiev/base/nodejs
+  IMAGE_REPO: ghcr.io/aaheiev/simple-nodejs-app
+
+jobs:
+
+  build:
+    name: Build base image
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure workflow
+      id: config
+      run: |
+        PRODUCT_VERSION=$(cat package.json | jq -r '.version')
+        ASSEMBLY_VERSION="${PRODUCT_VERSION}.${{ github.run_number }}"
+        BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
+        echo "PRODUCT_VERSION=$PRODUCT_VERSION" >> $GITHUB_ENV
+        echo "ASSEMBLY_VERSION=$ASSEMBLY_VERSION" >> $GITHUB_ENV
+        echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV       
+        echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+
+    - name: Login to github container registry
+      id: docker_login
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Build docker image
+      id: docker_app_build
+      run: |
+        docker_tag_exists=$(docker manifest inspect ${{ env.APP_IMAGE_REPO }}:$GITHUB_SHA > /dev/null ; echo $?)
+        if [[ $docker_tag_exists == 0 ]]; then
+          echo "Using existing image"
+          docker pull ${{ env.IMAGE_REPO }}:$GITHUB_SHA
+        else
+          echo "Building new image"
+          docker build \
+            --build-arg base_image=${{ env.BASE_IMAGE }} \
+            --build-arg build_id=${{ github.run_number }} \
+            --build-arg git_branch=${{ steps.config.outputs.branch }} \
+            --build-arg git_commit_id=$GITHUB_SHA \
+            --build-arg assembly_version=${{ env.ASSEMBLY_VERSION }} \
+            --build-arg product_version=${{ env.PRODUCT_VERSION }} \
+            -t ${{ env.IMAGE_REPO }}:$GITHUB_SHA .
+          docker push ${{ env.IMAGE_REPO }}:$GITHUB_SHA
+        fi
+
+    - name: Publish docker image tags
+      run: |
+        docker tag ${{ env.IMAGE_REPO }}:$GITHUB_SHA ${{ env.IMAGE_REPO }}:${{ env.ASSEMBLY_VERSION }}
+        docker push ${{ env.IMAGE_REPO }}:${{ env.ASSEMBLY_VERSION }}
+
+    - name: Publish docker stable tags
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        docker tag ${{ env.IMAGE_REPO }}:$GITHUB_SHA ${{ env.IMAGE_REPO }}:${{ env.PRODUCT_VERSION }}
+        docker push ${{ env.IMAGE_REPO }}:${{ env.PRODUCT_VERSION }}
+        docker tag ${{ env.IMAGE_REPO }}:$GITHUB_SHA ${{ env.IMAGE_REPO }}:latest
+        docker push ${{ env.IMAGE_REPO }}:latest
